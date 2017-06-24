@@ -1,0 +1,11 @@
+{
+  "manifest_version": 2,
+
+  "name": "AlternativeScrolling",
+  "description": "Scroll with audio and video! Using hands is archaic and overrated!",
+  "version": "1.0",
+
+  "background": {
+      "page": "background.html"
+   }
+}
