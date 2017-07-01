@@ -50,17 +50,22 @@ const handleStream = stream => {
 
 const getPitch = () => {
   analyser.getFloatTimeDomainData(dataArray);
-
   const pitch = autoCorrelate(dataArray, audioCtx.sampleRate);
-  if(pitch > 90 && pitch < 150){
+  if((pitch > 80 && pitch < 180) || (pitch > 290 && pitch < 650)){
     chrome.tabs.query({active: true}, tabs => {
-      chrome.tabs.sendMessage(tabs[0].id, {scrollDir: "down"});
-    });
-  } else if(pitch > 290 && pitch < 390) {
-    chrome.tabs.query({active: true}, tabs => {
-      chrome.tabs.sendMessage(tabs[0].id, {scrollDir: "up"});
+      chrome.tabs.sendMessage(tabs[0].id, {scrollDist: calculateScrollDist(pitch)});
     });
   }
+}
+
+const calculateScrollDist = pitch => {
+  const isLowPitch = pitch < 180;
+  const pitchRange = isLowPitch ? [180, 90] : [290, 600];
+  const distRange = [20, 500];
+
+  const speed = ((pitch - pitchRange[0]) / (pitchRange[1] - pitchRange[0]) * (distRange[1] - distRange[0])) + distRange[0];
+  const direction = isLowPitch ? 1 : -1;
+  return speed * direction;
 }
 
 function autoCorrelate( buf, sampleRate ) {
