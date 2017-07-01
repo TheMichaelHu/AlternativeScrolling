@@ -5,8 +5,16 @@
   "description": "Scroll with audio and video! Using hands is archaic and overrated!",
   "version": "1.0",
 
+  "content_scripts":
+    [
+      {
+        "matches": ["*://*/*"],
+        "js": ["content.es6"]
+      }
+    ],
+
   "background": {
-      "page": "background.html"
+      "scripts": ["background.es6"]
    },
 
    "browser_action": {

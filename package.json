@@ -4,6 +4,5 @@
   "version": "1.0.0",
   "author": "Michael Hu <michaelanhu@gmail.com>",
   "dependencies": {
-    "jquery": ">= 1.12"
   }
 }

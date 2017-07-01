@@ -5,7 +5,7 @@ let dataArray = null;
 window.onload = function() {
   navigator.getUserMedia = (navigator.getUserMedia ||
                             navigator.webkitGetUserMedia ||
-                            navigator.mozGetUserMedia || 
+                            navigator.mozGetUserMedia ||
                             navigator.msGetUserMedia);
 
   if (navigator.getUserMedia) {
@@ -13,7 +13,7 @@ window.onload = function() {
 
     navigator.getUserMedia(
       {
-        video: true,
+        video: false,
         audio: {
           "mandatory": {
               "googEchoCancellation": "false",
@@ -24,11 +24,10 @@ window.onload = function() {
           }
       },
       localMediaStream => {
-        vid.src = window.URL.createObjectURL(localMediaStream);
         handleStream(localMediaStream);
       },
       err => {
-        alert('Oops, you should feel bad') 
+        alert('Oops, you should feel bad')
       });
 
   } else {
@@ -46,16 +45,23 @@ const handleStream = stream => {
   dataArray = new Float32Array(bufferLength);
   analyser.getFloatTimeDomainData(dataArray);
 
-  getPitch();
+  window.setInterval(getPitch, 100);
 }
 
-const getPitch = time => {
+const getPitch = () => {
   analyser.getFloatTimeDomainData(dataArray);
 
-  console.log(autoCorrelate(dataArray, audioCtx.sampleRate))
-  let pitch = autoCorrelate(dataArray, audioCtx.sampleRate);
-
-  window.requestAnimationFrame( getPitch );
+  const pitch = autoCorrelate(dataArray, audioCtx.sampleRate);
+  console.log(pitch)
+  if(pitch > 90 && pitch < 150){
+    chrome.tabs.query({active: true}, tabs => {
+      chrome.tabs.sendMessage(tabs[0].id, {scrollDir: "down"});
+    });
+  } else if(pitch > 300 && pitch < 400) {
+    chrome.tabs.query({active: true}, tabs => {
+      chrome.tabs.sendMessage(tabs[0].id, {scrollDir: "up"});
+    });
+  }
 }
 
 function autoCorrelate( buf, sampleRate ) {
@@ -99,10 +105,10 @@ function autoCorrelate( buf, sampleRate ) {
       // we need to do a curve fit on correlations[] around best_offset in order to better determine precise
       // (anti-aliased) offset.
 
-      // we know best_offset >=1, 
-      // since foundGoodCorrelation cannot go to true until the second pass (offset=1), and 
+      // we know best_offset >=1,
+      // since foundGoodCorrelation cannot go to true until the second pass (offset=1), and
       // we can't drop into this clause until the following pass (else if).
-      var shift = (correlations[best_offset+1] - correlations[best_offset-1])/correlations[best_offset];  
+      var shift = (correlations[best_offset+1] - correlations[best_offset-1])/correlations[best_offset];
       return sampleRate/(best_offset+(8*shift));
     }
     lastCorrelation = correlation;
