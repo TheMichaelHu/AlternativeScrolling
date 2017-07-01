@@ -52,12 +52,11 @@ const getPitch = () => {
   analyser.getFloatTimeDomainData(dataArray);
 
   const pitch = autoCorrelate(dataArray, audioCtx.sampleRate);
-  console.log(pitch)
   if(pitch > 90 && pitch < 150){
     chrome.tabs.query({active: true}, tabs => {
       chrome.tabs.sendMessage(tabs[0].id, {scrollDir: "down"});
     });
-  } else if(pitch > 300 && pitch < 400) {
+  } else if(pitch > 290 && pitch < 390) {
     chrome.tabs.query({active: true}, tabs => {
       chrome.tabs.sendMessage(tabs[0].id, {scrollDir: "up"});
     });
